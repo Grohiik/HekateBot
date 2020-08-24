@@ -1,5 +1,6 @@
-from Token import mojira_password, mojira_username, bot_token as TOKEN
+from Token import mojira_password, mojira_username, hekate_token as TOKEN
 import discord
+from discord.ext import commands
 import re
 from jira import JIRA
 from discord.utils import get
@@ -9,7 +10,9 @@ regex = re.compile(
     "((mc|mcapi|mcce|mcd|mcl|mcpe|mce|realms|web|bds)-[0-9]+)", re.IGNORECASE
 )
 
-client = discord.Client()
+client = commands.Bot(command_prefix="!")
+
+Voicechannel = {}
 
 hekate_id = 563388386564505620
 hekate_join_log_id = 720034217920036974
@@ -17,12 +20,10 @@ hekate_join_log_id = 720034217920036974
 hekate_extra_id = 715660274937626635
 hekate_extra_join_log_id = 715939568590782464
 
-Voicechannel = {}
-
 
 async def mc_bug(message, issues):
     jira = JIRA(
-        server="https://bugs.mojang.com", basic_auth=(mojira_username, mojira_password),
+        server="https://bugs.mojang.com", auth=(mojira_username, mojira_password),
     )
 
     for issueid in issues[:3]:
@@ -47,6 +48,8 @@ async def mc_bug(message, issues):
                 await message.channel.send(f"{issueid[0]} does not exist")
             except:
                 await message.channel.send(f"fuck off {message.author.mention}")
+
+    jira.close()
 
 
 @client.event
